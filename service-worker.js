@@ -1,4 +1,4 @@
-const CACHE_NAME = 'murojaah-tije-v1.23';
+const CACHE_NAME = 'murojaah-tije-v1.24';
 const FILES_TO_CACHE = [
   './',
   './index.html',
