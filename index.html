@@ -1,487 +1,123 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Murojaah Tije</title>
 
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f766e">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Murojaah Tije">
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Murojaah Tije" />
 
   <style>
     @font-face{
-      font-family:"KFGQPC";
-      src:url("fonts/KFGQPC.woff2") format("woff2"),
-          url("fonts/KFGQPC.ttf") format("truetype");
+      font-family:'MushafMadani';
+      src:url('./fonts/QCF_P001.ttf') format('truetype'),
+          url('./fonts/KFGQPC.woff2') format('woff2'),
+          url('./fonts/KFGQPC.ttf') format('truetype');
+      font-weight:400;
+      font-style:normal;
       font-display:swap;
     }
 
     *{box-sizing:border-box}
     :root{
-      --green:#0f766e;--deep:#064e3b;--gold:#b7791f;--soft:#ecfdf5;
-      --bg:#f3f7f2;--text:#173b2f;--muted:#647067;--line:#d9e8df;
-      --red:#fee2e2;--yellow:#fef3c7;--blue:#dbeafe;--ok:#dcfce7;
-      --mushaf:#fbf3df;--mushaf2:#fffaf0;
+      --green:#0f766e;--deep:#064e3b;--gold:#b7791f;--cream:#fff6df;--cream2:#fbf1d5;
+      --soft:#ecfdf5;--bg:#f3f7f2;--text:#173b2f;--muted:#647067;--red:#fee2e2;
+      --yellow:#fef3c7;--blue:#dbeafe;--ok:#dcfce7;--ink:#111827;--line:#e5d7ad;
     }
-
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      background:var(--bg);color:var(--text);
-      padding-bottom:100px;min-height:100vh;
-    }
-
-    header{
-      background:radial-gradient(circle at top left,#20b486,transparent 32%),
-                 linear-gradient(135deg,var(--deep),var(--green));
-      color:white;padding:20px 18px 22px;border-radius:0 0 28px 28px;
-      box-shadow:0 10px 25px rgba(6,78,59,.22);position:sticky;top:0;z-index:10;
-    }
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.18);display:grid;place-items:center;overflow:hidden;font-size:26px}
-    .logo img{width:100%;height:100%;object-fit:cover}
-    .brand h1{font-size:24px;margin:0}
-    .brand p{margin:3px 0 0;opacity:.9;font-size:13px}
-    .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);padding:6px 10px;border-radius:999px;font-size:12px;margin-top:12px}
-    .top-actions{display:flex;gap:8px;margin-top:12px}
-    .top-actions button{font-size:13px;padding:10px}
-
-    main{padding:16px}
-    .page{display:none}
-    .page.active{display:block}
-    .card{
-      background:white;border-radius:20px;padding:16px;margin-bottom:14px;
-      box-shadow:0 8px 22px rgba(0,0,0,.08);
-      border:1px solid rgba(15,118,110,.08);
-    }
-    .mushaf-card{
-      background:linear-gradient(180deg,var(--mushaf2),var(--mushaf));
-      border:1px solid #ead8a8;
-      box-shadow:0 10px 28px rgba(92,64,20,.12);
-    }
-    h2,h3,h4{margin:0 0 10px}
-    .small{font-size:13px;color:var(--muted);line-height:1.55}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .stat{background:linear-gradient(180deg,#fff,#ecfdf5);border:1px solid #d9efe5;border-radius:18px;padding:14px;text-align:center;font-weight:700}
-    .stat b{font-size:23px;color:var(--green)}
-
-    select,input,textarea,button{
-      width:100%;padding:12px;border-radius:14px;border:1px solid #cbd8d1;
-      font-size:15px;background:white;color:var(--text);
-    }
-    label{display:block;font-weight:800;margin:12px 0 4px}
-    button{background:var(--green);color:white;border:0;font-weight:850;cursor:pointer;box-shadow:0 6px 15px rgba(15,118,110,.18)}
-    button.secondary{background:#e7f6f1;color:var(--green);box-shadow:none}
-    button.gold{background:var(--gold)}
-    button.dark{background:#064e3b}
-    .row{display:flex;gap:8px}
-    .row>*{flex:1}
-    .toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:5px}
-    .toolbar button{white-space:nowrap;width:auto;padding:10px 14px;background:#e7f6f1;color:var(--green);box-shadow:none}
-    .toolbar button.on{background:var(--green);color:white}
-
-    .page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:360px;overflow:auto;padding:2px}
-    .page-btn{padding:10px 4px;border-radius:14px;background:#fff;color:var(--green);border:1px solid #d9e8df;box-shadow:none;font-size:13px}
-    .page-btn.active{background:var(--green);color:#fff}
-    .surah-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
-    .surah-btn{display:flex;justify-content:space-between;align-items:center;background:#fff;color:var(--text);border:1px solid var(--line);box-shadow:none;text-align:left}
-    .search{margin:10px 0}
-
-    .ayah{
-      border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;
-      background:white;position:relative;overflow:hidden;
-    }
-    .ayah.target{background:var(--blue)}
-    .ayah.ok{background:var(--ok)}
-    .ayah.review{background:var(--yellow)}
-    .ayah.hard{background:var(--red)}
-    .mushaf-page-box{
-      background:linear-gradient(180deg,#fffaf0,#fbf3df);
-      border:1px solid #d9bd72;border-radius:22px;
-      padding:18px;margin-bottom:14px;
-      box-shadow:inset 0 0 0 2px rgba(183,121,31,.08),0 8px 24px rgba(92,64,20,.1);
-    }
-    .page-title{text-align:center;color:#6b3f0c;font-weight:900;margin-bottom:12px}
-    .badge{display:inline-block;padding:5px 10px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:850;margin-bottom:8px}
-    .arab,.trigger{
-      direction:rtl;text-align:right;
-      font-family:"KFGQPC","Traditional Arabic","Amiri","Times New Roman",serif;
-    }
-    .arab{font-size:38px;line-height:2.35;color:#17130c}
-    .trigger{font-size:34px;line-height:2.1;color:var(--gold);font-weight:900}
-    .mushaf-line{
-      direction:rtl;text-align:justify;text-align-last:right;
-      font-family:"KFGQPC","Traditional Arabic","Amiri","Times New Roman",serif;
-      font-size:34px;line-height:2.25;color:#17130c;
-    }
-    .ayah-num{
-      display:inline-grid;place-items:center;
-      min-width:34px;height:34px;margin:0 5px;
-      border:1.5px solid #9a6a15;border-radius:50%;
-      font-size:20px;color:#6b3f0c;background:rgba(255,255,255,.5);
-      vertical-align:middle;
-    }
-    .translation{font-size:14px;line-height:1.6;color:#334155}
-    .btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
-    .btn-row button{font-size:12px;padding:9px 5px;box-shadow:none}
-    .empty{text-align:center;color:var(--muted);padding:18px}
-    .progressbar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}
-    .progressbar span{display:block;height:100%;background:var(--green);border-radius:999px}
-    .listitem{padding:12px;border-radius:14px;background:#f8fafc;margin-bottom:8px;border:1px solid #e5e7eb}
-    .hidden{display:none!important}
-    .status-dot{font-size:12px;font-weight:900;padding:4px 8px;border-radius:999px;background:#ecfdf5;color:#166534}
-
-    .nav{
-      position:fixed;left:0;right:0;bottom:0;background:white;display:grid;
-      grid-template-columns:repeat(5,1fr);box-shadow:0 -6px 24px rgba(0,0,0,.12);
-      padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:99;
-    }
-    .nav button{background:white;color:var(--green);box-shadow:none;border:0;font-size:12px;padding:8px 2px;border-radius:14px}
-    .nav button.active{background:var(--soft);font-weight:900}
-    .toast{position:fixed;left:16px;right:16px;bottom:100px;background:#052e2b;color:white;padding:12px 14px;border-radius:14px;z-index:120;display:none;text-align:center}
-
-    @media(max-width:640px){
-      .arab{font-size:32px;line-height:2.25}
-      .mushaf-line{font-size:31px;line-height:2.15}
-      .trigger{font-size:30px}
-      .row{flex-direction:column}
-      .btn-row{grid-template-columns:repeat(2,1fr)}
-      .page-grid{grid-template-columns:repeat(4,1fr)}
-    }
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:98px;min-height:100vh}
+    header{background:radial-gradient(circle at top left,#20b486,transparent 34%),linear-gradient(135deg,var(--deep),var(--green));color:white;padding:22px 18px 24px;border-radius:0 0 30px 30px;box-shadow:0 10px 25px rgba(6,78,59,.22);position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;gap:14px}.logo{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.18);display:grid;place-items:center;overflow:hidden;font-size:28px}.logo img{width:100%;height:100%;object-fit:cover}.brand h1{font-size:30px;line-height:1;margin:0}.brand p{margin:6px 0 0;opacity:.92;font-size:15px}.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);padding:8px 12px;border-radius:999px;font-size:14px;margin-top:16px}.top-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.top-actions button{background:#e7f6f1;color:var(--green);box-shadow:none;font-size:17px;padding:15px}
+    main{padding:16px}.page{display:none}.page.active{display:block}.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 22px rgba(0,0,0,.08);border:1px solid rgba(15,118,110,.08)}h2,h3,h4{margin:0 0 10px}.small{font-size:13px;color:var(--muted);line-height:1.55}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.stat{background:linear-gradient(180deg,#fff,#ecfdf5);border:1px solid #d9efe5;border-radius:18px;padding:14px;text-align:center;font-weight:800}.stat b{font-size:24px;color:var(--green)}
+    select,input,textarea,button{width:100%;padding:12px;border-radius:14px;border:1px solid #cbd8d1;font-size:15px;background:white;color:var(--text)}label{display:block;font-weight:850;margin:12px 0 4px}button{background:var(--green);color:white;border:0;font-weight:900;cursor:pointer;box-shadow:0 6px 15px rgba(15,118,110,.18)}button.secondary{background:#e7f6f1;color:var(--green);box-shadow:none}button.gold{background:var(--gold);color:#fff}.row{display:flex;gap:8px}.row>*{flex:1}.toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:5px}.toolbar button{white-space:nowrap;width:auto;padding:10px 14px;background:#e7f6f1;color:var(--green);box-shadow:none}.toolbar button.on{background:var(--green);color:white}
+    .page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:350px;overflow:auto;padding:2px}.page-btn{padding:10px 4px;border-radius:14px;background:#fff;color:var(--green);border:1px solid #d9e8df;box-shadow:none;font-size:13px}.page-btn.active{background:var(--green);color:#fff}
+    .mushaf-shell{background:linear-gradient(180deg,#fffaf0,#fff5dd);border:1px solid var(--line);border-radius:26px;padding:14px;margin-bottom:14px;box-shadow:0 8px 22px rgba(104,80,20,.12)}.mushaf-head{text-align:center;border:2px solid #e3d3a4;border-radius:22px;padding:12px;background:rgba(255,255,255,.55);margin-bottom:18px}.mushaf-head h2{font-size:25px;color:#6b4b16}.mushaf-head .meta{font-weight:800;color:#6b4b16}.bismillah{direction:rtl;text-align:center;font-family:'MushafMadani','Scheherazade New','Traditional Arabic',serif;font-size:38px;line-height:2;color:var(--ink);margin:8px 0 18px}.mushaf-page{background:var(--cream);border-radius:18px;padding:14px 10px;border:1px solid rgba(183,121,31,.2);min-height:360px}
+    .ayah{border:1px solid #d9e8df;border-radius:18px;padding:14px;margin-bottom:12px;background:white;position:relative;overflow:hidden}.ayah.ok{background:var(--ok)}.ayah.review{background:var(--yellow)}.ayah.hard{background:var(--red)}.ayah.mushaf-line{background:transparent;border:0;border-bottom:1px solid rgba(183,121,31,.18);border-radius:0;box-shadow:none;padding:18px 4px;margin:0}.badge{display:inline-block;padding:5px 10px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:850;margin-bottom:8px}.ayah.mushaf-line .badge{background:transparent;color:#6b4b16;padding:0;margin:0 0 6px;display:block;text-align:right}
+    .arab,.trigger{direction:rtl;text-align:right;font-family:'MushafMadani','KFGQPC Uthman Taha Naskh','Scheherazade New','Traditional Arabic','Times New Roman',serif;font-weight:400;letter-spacing:0;word-spacing:8px;color:var(--ink)}.arab{font-size:42px;line-height:2.45}.trigger{font-size:42px;line-height:2.35;color:#111827}.translation{font-size:14px;line-height:1.6;color:#334155}.mushaf-line .translation{display:none}.ayah-no{display:inline-grid;place-items:center;vertical-align:middle;width:42px;height:42px;margin:0 10px;border:2px solid #b7791f;border-radius:50%;font-family:system-ui;font-size:22px;color:#80530c;background:#fff9e9}.btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.btn-row button{font-size:12px;padding:10px 6px;box-shadow:none}.empty{text-align:center;color:var(--muted);padding:18px}.progressbar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progressbar span{display:block;height:100%;background:var(--green);border-radius:999px}.listitem{padding:12px;border-radius:14px;background:#f8fafc;margin-bottom:8px;border:1px solid #e5e7eb}.hidden{display:none!important}
+    .nav{position:fixed;left:0;right:0;bottom:0;background:white;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -6px 24px rgba(0,0,0,.12);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:99}.nav button{background:white;color:var(--green);box-shadow:none;border:0;font-size:13px;padding:9px 2px;border-radius:18px}.nav button.active{background:var(--soft);font-weight:900}.toast{position:fixed;left:16px;right:16px;bottom:96px;background:#052e2b;color:white;padding:12px 14px;border-radius:14px;z-index:120;display:none;text-align:center}.search{margin:10px 0}.surah-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}.surah-btn{display:flex;justify-content:space-between;align-items:center;background:#fff;color:var(--text);border:1px solid #d9e8df;box-shadow:none;text-align:left}.surah-btn small{color:var(--muted)}
+    @media(max-width:640px){header{padding:24px 30px 28px}.brand h1{font-size:40px}.brand p{font-size:22px}.top-actions{grid-template-columns:1fr}.top-actions button{font-size:20px}.arab,.trigger{font-size:39px;line-height:2.25}.bismillah{font-size:34px}.row{flex-direction:column}.btn-row{grid-template-columns:1fr}.mushaf-shell{padding:12px}.nav button{font-size:13px}.page-grid{grid-template-columns:repeat(5,1fr)}}
   </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <div class="logo"><img src="icon-192.png" onerror="this.outerHTML='📖'" alt="Logo Murojaah Tije"></div>
-    <div><h1>Murojaah Tije</h1><p>Mushaf Madinah • Hafalan • Murojaah</p></div>
+    <div><h1>Murojaah Tije</h1><p>Teman setia menghafal Al-Qur’an</p></div>
   </div>
-  <div class="chip" id="offlineChip">📖 Mode Mushaf siap</div>
-  <div class="top-actions">
-    <button class="secondary" onclick="openPage('mushaf')">Buka Mushaf</button>
-    <button class="secondary" onclick="resumeReading()">Lanjut Terakhir</button>
-  </div>
+  <div class="chip" id="statusChip">✨ Menjaga Hafalan, Menguatkan Murojaah</div>
+  <div class="top-actions"><button class="secondary" onclick="openPage('mushaf')">📖 Buka Mushaf</button><button class="secondary" onclick="resumeReading()">↩️ Lanjut Terakhir</button></div>
 </header>
 
 <main>
 <section id="home" class="page active">
   <div class="card"><h2>Assalamu’alaikum, Bro Tije</h2><p class="small">Bismillah, hafalan sedikit tapi istiqamah.</p></div>
-  <div class="grid">
-    <div class="stat">🎯<br><b id="statTarget">0</b><br>Target</div>
-    <div class="stat">✅<br><b id="statOk">0</b><br>Hafal</div>
-    <div class="stat">🟡<br><b id="statReview">0</b><br>Perlu Ulang</div>
-    <div class="stat">🔥<br><b id="statStreak">0</b><br>Streak</div>
-  </div>
-  <div class="card"><h3>📖 Lanjut Terakhir Dibaca</h3><p class="small" id="lastReadText">Belum ada bacaan terakhir.</p><button onclick="resumeReading()">Buka Terakhir</button></div>
+  <div class="grid"><div class="stat">🎯<br><b id="statTarget">0</b><br>Target</div><div class="stat">✅<br><b id="statOk">0</b><br>Hafal</div><div class="stat">🟡<br><b id="statReview">0</b><br>Ulang</div><div class="stat">🔴<br><b id="statHard">0</b><br>Belum</div></div>
+  <div class="card"><h3>📖 Lanjut Terakhir Dibaca</h3><p class="small" id="lastReadText">Belum ada halaman terakhir.</p><button onclick="resumeReading()">Buka Terakhir</button></div>
   <div class="card"><h3>Progress Total</h3><div class="progressbar"><span id="totalBar" style="width:0%"></span></div><p class="small"><span id="totalPercent">0%</span> dari ayat yang sudah dicatat.</p></div>
   <div class="card"><h3>Jadwal Murojaah Hari Ini</h3><div id="todayReviews" class="empty">Belum ada jadwal.</div></div>
 </section>
 
 <section id="mushaf" class="page">
-  <div class="card mushaf-card">
+  <div class="card">
     <h2>Mushaf Madinah</h2>
-    <p class="small">Gunakan Mode Halaman jika file <b>data/pages/page-001.json</b> sampai <b>page-604.json</b> sudah tersedia. Gunakan Mode Surah Online bila data halaman belum lengkap.</p>
-    <div class="toolbar">
-      <button id="tabPage" class="on" onclick="setMushafTab('page')">📄 Halaman 604</button>
-      <button id="tabSurah" onclick="setMushafTab('surah')">📚 Surah Online</button>
-      <button id="tabClean" onclick="toggleCleanMode()">🕋 Mode Bersih</button>
-    </div>
+    <p class="small">Mode utama memakai data halaman <b>data/pages/page-001.json</b> sampai <b>page-604.json</b>. Jika file halaman belum ada, aplikasi otomatis memakai mode surah online.</p>
+    <div class="toolbar"><button id="tabPage" class="on" onclick="setMushafTab('page')">📄 Halaman</button><button id="tabSurah" onclick="setMushafTab('surah')">📚 Surah Online</button><button onclick="toggleCleanMode()">🧹 Mode Bersih</button></div>
   </div>
 
-  <div id="pageTools" class="card">
-    <h3>Buka Halaman Mushaf</h3>
+  <div id="pagePanel" class="card">
+    <h3>Buka Halaman 604</h3>
     <div class="row"><button class="secondary" onclick="prevMushafPage()">← Halaman</button><button class="secondary" onclick="nextMushafPage()">Halaman →</button></div>
-    <label>Nomor Halaman</label>
-    <div class="row"><input id="pageInput" type="number" min="1" max="604" value="1"><button onclick="openMushafPage(Number($('pageInput').value))">Buka</button></div>
+    <label>Nomor halaman</label><div class="row"><input id="pageInput" type="number" min="1" max="604" value="1"><button onclick="openMushafPage(Number($('pageInput').value))">Buka</button></div>
   </div>
-
-  <div id="pageGridCard" class="card"><h3>Pilih Halaman</h3><div id="pageGrid" class="page-grid"></div></div>
-
-  <div id="surahTools" class="card hidden">
-    <h3>Surah Online</h3>
-    <input class="search" id="searchSurah" placeholder="Cari surat, contoh: Al-Mulk" oninput="renderSurahList()">
-    <div id="surahList" class="surah-grid"></div>
-    <div id="rangeTools" class="hidden">
-      <label>Rentang Ayat</label>
-      <div class="row"><input id="readStart" type="number" value="1"><input id="readEnd" type="number" value="5"><button onclick="loadSurahAyat()">Tampilkan</button></div>
-    </div>
+  <div id="surahPanel" class="card hidden">
+    <h3>Surah Online</h3><input class="search" id="searchSurah" placeholder="Cari surat, contoh: An-Nas" oninput="renderSurahList()"><div id="surahList" class="surah-grid"></div>
   </div>
-
   <div id="ayahList"></div>
 </section>
 
 <section id="target" class="page">
-  <div class="card">
-    <h2>Target Hafalan</h2>
-    <label>Halaman Mushaf</label><input id="targetPage" type="number" min="1" max="604" value="1">
-    <div class="row"><div><label>Ayat awal</label><input id="targetStart" type="number" value="1"></div><div><label>Ayat akhir</label><input id="targetEnd" type="number" value="5"></div></div>
-    <label>Mode Target</label><select id="targetMode"><option>Hafalan Baru</option><option>Murojaah</option><option>Penguatan Ayat Sulit</option></select>
-    <label>Target cepat</label><div class="row"><button class="secondary" onclick="quickTarget(3)">3 Ayat</button><button class="secondary" onclick="quickTarget(5)">5 Ayat</button><button class="secondary" onclick="quickTarget(10)">10 Ayat</button></div>
-    <button onclick="saveTarget()" style="margin-top:10px">Simpan Target</button>
-  </div>
+  <div class="card"><h2>Target Hafalan</h2><label>Halaman/Surah</label><input id="targetPage" value="Halaman 1"><div class="row"><div><label>Ayat awal</label><input id="targetStart" type="number" value="1"></div><div><label>Ayat akhir</label><input id="targetEnd" type="number" value="5"></div></div><label>Mode Target</label><select id="targetMode"><option>Hafalan Baru</option><option>Murojaah</option><option>Penguatan Ayat Sulit</option></select><div class="row"><button class="secondary" onclick="quickTarget(3)">3 Ayat</button><button class="secondary" onclick="quickTarget(5)">5 Ayat</button><button class="secondary" onclick="quickTarget(10)">10 Ayat</button></div><button onclick="saveTarget()" style="margin-top:10px">Simpan Target</button></div>
   <div class="card"><h3>Target Tersimpan</h3><div id="targetList" class="empty">Belum ada target.</div></div>
 </section>
 
-<section id="review" class="page">
-  <div class="card"><h2>Murojaah</h2><p class="small">Jadwal otomatis H+1, H+3, H+7, H+14, H+30 setelah ayat ditandai hafal.</p><div id="reviewList" class="empty">Belum ada data.</div></div>
-  <div class="card"><h3>Ayat Sulit</h3><div id="hardList" class="empty">Belum ada ayat sulit.</div></div>
-</section>
+<section id="review" class="page"><div class="card"><h2>Murojaah</h2><p class="small">Jadwal otomatis H+1, H+3, H+7, H+14, H+30 setelah ayat ditandai hafal.</p><div id="reviewList" class="empty">Belum ada data.</div></div></section>
 
 <section id="progress" class="page">
   <div class="card"><h2>Progress</h2><div id="progressList" class="empty">Belum ada progress.</div></div>
-  <div class="card"><h3>Tentang</h3><p><b>Murojaah Tije</b><br>Versi GitHub v2.3 Hybrid Mushaf</p><p class="small">Tampilan memakai font Mushaf jika file <b>fonts/KFGQPC.woff2</b> tersedia. Data progress tersimpan lokal di perangkat.</p><button class="gold" onclick="exportProgress()">Ekspor Backup Progress</button><button class="secondary" onclick="resetProgress()" style="margin-top:8px">Reset Data Lokal</button></div>
+  <div class="card"><h3>Tentang</h3><p><b>Murojaah Tije V3</b><br>Mode Mushaf Madinah + Surah Online.</p><p class="small">Untuk huruf yang paling mendekati mushaf cetak, upload font ke folder <b>fonts/QCF_P001.ttf</b>. Tanpa font itu aplikasi tetap jalan, tetapi memakai font cadangan HP.</p><button class="gold" onclick="exportProgress()">Ekspor Backup Progress</button><button class="secondary" onclick="resetProgress()" style="margin-top:8px">Reset Data Lokal</button></div>
 </section>
 </main>
 
-<div class="nav">
-  <button class="active" onclick="openPage('home')">🏠<br>Beranda</button>
-  <button onclick="openPage('mushaf')">📖<br>Mushaf</button>
-  <button onclick="openPage('target')">🎯<br>Target</button>
-  <button onclick="openPage('review')">🔄<br>Murojaah</button>
-  <button onclick="openPage('progress')">📊<br>Progress</button>
-</div>
+<div class="nav"><button class="active" onclick="openPage('home')">🏠<br>Beranda</button><button onclick="openPage('mushaf')">📖<br>Mushaf</button><button onclick="openPage('target')">🎯<br>Target</button><button onclick="openPage('review')">↩️<br>Murojaah</button><button onclick="openPage('progress')">📊<br>Progress</button></div>
 <div id="toast" class="toast"></div>
 
 <script>
-const API='https://equran.id/api/v2';
-const PAGE_PATH='data/pages/page-';
-const PAGE_EXT='.json';
-const TOTAL_PAGES=604;
-let currentPage=1,currentPageData=null,currentSurah=null,currentTab='page',cleanMode=false;
-let AYAH_MAP={},SURAH=[],AUDIO=null;
-const LS={progress:'mt_progress_v23',targets:'mt_targets_v23',reviews:'mt_reviews_v23',last:'mt_last_v23'};
-
-function $(id){return document.getElementById(id)}
-function toast(msg){$('toast').innerText=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2300)}
-function todayStr(d=new Date()){return d.toISOString().slice(0,10)}
-function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return todayStr(d)}
-function loadLS(k,def){try{return JSON.parse(localStorage.getItem(k))??def}catch(e){return def}}
-function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function pad(n){return String(n).padStart(3,'0')}
-function pageUrl(n){return PAGE_PATH+pad(n)+PAGE_EXT}
-function esc(t){return String(t||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
-function arNum(n){return String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d])}
-
-function normalizePageJson(raw,pageNo){
-  if(Array.isArray(raw)) return {page:pageNo,ayahs:raw};
-  if(raw.ayahs) return raw;
-  if(raw.verses) return {page:raw.page||pageNo,ayahs:raw.verses};
-  if(raw.data&&Array.isArray(raw.data)) return {page:pageNo,ayahs:raw.data};
-  if(raw.data&&raw.data.ayahs) return raw.data;
-  return {page:pageNo,ayahs:[]};
-}
-function normalizeAyah(a,i){
-  return {
-    surahNo:Number(a.surahNo??a.surah_number??a.sura??a.chapter??a.surah?.number??currentSurah?.nomor??0),
-    surah:a.surah??a.surahName??a.latin??a.surah_name??a.chapterName??currentSurah?.namaLatin??'',
-    ayahNo:Number(a.ayahNo??a.nomorAyat??a.number??a.ayah_number??a.verse??a.aya??i+1),
-    arab:a.arab??a.text??a.arabic??a.uthmani??a.teksArab??'',
-    translation:a.translation??a.arti??a.teksIndonesia??a.id??'',
-    juz:a.juz??'',
-    page:a.page??currentPage,
-    audio:getAudio(a)
-  };
-}
-function getAudio(a){if(!a.audio)return '';if(typeof a.audio==='string')return a.audio;const vals=Object.values(a.audio);return vals.length?vals[0]:''}
-
-function setMushafTab(tab){
-  currentTab=tab;
-  $('tabPage').classList.toggle('on',tab==='page');
-  $('tabSurah').classList.toggle('on',tab==='surah');
-  $('pageTools').classList.toggle('hidden',tab!=='page');
-  $('pageGridCard').classList.toggle('hidden',tab!=='page');
-  $('surahTools').classList.toggle('hidden',tab!=='surah');
-  $('ayahList').innerHTML='';
-  if(tab==='page') openMushafPage(currentPage||1);
-  if(tab==='surah' && !SURAH.length) loadSurahList();
-}
-function toggleCleanMode(){
-  cleanMode=!cleanMode;
-  $('tabClean').classList.toggle('on',cleanMode);
-  if(currentTab==='page' && currentPageData) renderAyahs((currentPageData.ayahs||[]).map(normalizeAyah),currentPage,true);
-  else if(currentSurah) loadSurahAyat();
-}
-
-async function openMushafPage(n){
-  if(!n||n<1||n>TOTAL_PAGES){toast('Nomor halaman 1-604');return}
-  currentPage=n;$('pageInput').value=n;setActivePageBtn(n);
-  $('targetPage').value=n;
-  $('ayahList').innerHTML='<div class="card empty">Memuat halaman '+n+'...</div>';
-  try{
-    const r=await fetch(pageUrl(n),{cache:'no-cache'});
-    if(!r.ok) throw new Error('File belum ada: '+pageUrl(n));
-    const raw=await r.json();
-    currentPageData=normalizePageJson(raw,n);
-    const ayahs=(currentPageData.ayahs||[]).map(normalizeAyah);
-    saveLS(LS.last,{type:'page',page:n,date:todayStr()});
-    renderAyahs(ayahs,n,true);
-    $('offlineChip').innerText='📖 Halaman '+n+' aktif';
-    updateDashboard();
-  }catch(e){
-    $('ayahList').innerHTML='<div class="card empty">⚠️ '+e.message+'<br><br>Upload file halaman ke folder <b>data/pages</b>, atau buka tab <b>Surah Online</b>.</div>';
-  }
-}
-function renderAyahs(ayahs,pageNo,isPageMode=false){
-  if(!ayahs.length){$('ayahList').innerHTML='<div class="card empty">Data ayat kosong.</div>';return}
-  AYAH_MAP={};
-  if(cleanMode){
-    $('ayahList').innerHTML='<div class="mushaf-page-box"><div class="page-title">Halaman '+pageNo+'</div><div class="mushaf-line">'+ayahs.map(a=>{
-      const id=safeId(a);AYAH_MAP[id]=a;
-      return esc(a.arab)+' <span class="ayah-num">'+arNum(a.ayahNo)+'</span>';
-    }).join(' ')+'</div></div><div class="card"><button onclick="toggleCleanMode()">Keluar Mode Bersih</button></div>';
-    return;
-  }
-  $('ayahList').innerHTML=`<div class="card mushaf-card"><h2>${isPageMode?'Halaman '+pageNo:(currentSurah?.namaLatin||'Surah')}</h2><p class="small">${ayahs.length} ayat ditampilkan.</p></div>`+ayahs.map(a=>ayahHTML(a)).join('');
-}
-function key(a){return (a.surahNo||a.surah)+':'+a.ayahNo}
-function ayahClass(a){const st=loadLS(LS.progress,{})[key(a)]?.status;if(st==='Hafal Lancar')return 'ok';if(st==='Perlu Ulang')return 'review';if(st==='Belum Hafal')return 'hard';return ''}
-function triggerText(arab){return (arab||'').split(/\s+/).slice(0,3).join(' ')+' ...'}
-function safeId(a){return String((a.surahNo||a.surah)+'_'+a.ayahNo).replace(/[^a-zA-Z0-9_]/g,'_')}
-function ayahHTML(a){
-  const id=safeId(a);AYAH_MAP[id]=a;
-  const st=loadLS(LS.progress,{})[key(a)]?.status||'Belum dicatat';
-  return `<div class="ayah ${ayahClass(a)}" id="ayah_${id}">
-    <span class="badge">${esc(a.surah||'Surah '+a.surahNo)} : ${a.ayahNo} • Hal. ${a.page||currentPage} ${a.juz?('• Juz '+a.juz):''}</span>
-    <div class="trigger">${esc(triggerText(a.arab))}</div>
-    <div class="arab hidden" id="full_${id}">${esc(a.arab)} <span class="ayah-num">${arNum(a.ayahNo)}</span></div>
-    ${a.translation?`<p class="translation hidden" id="trn_${id}">${esc(a.translation)}</p>`:''}
-    <span class="status-dot">Status: ${esc(st)}</span>
-    <div class="btn-row">
-      <button onclick="toggleAyah('${id}')">👁️ Tampil</button>
-      <button onclick="markAyahById('${id}','Hafal Lancar')">✅ Hafal</button>
-      <button onclick="markAyahById('${id}','Perlu Ulang')">🟡 Ulang</button>
-      <button onclick="markAyahById('${id}','Belum Hafal')">🔴 Belum</button>
-    </div>
-    ${a.audio?`<button class="gold" style="margin-top:8px" onclick="playAudio('${String(a.audio).replace(/'/g,'')}')">▶ Dengarkan Murottal</button>`:''}
-  </div>`;
-}
-function toggleAyah(id){$('full_'+id)?.classList.toggle('hidden');$('trn_'+id)?.classList.toggle('hidden')}
-function markAyahById(id,status){const a=AYAH_MAP[id];if(!a){toast('Data ayat tidak ditemukan');return}markAyah(a,status)}
-function markAyah(a,status){
-  const p=loadLS(LS.progress,{});
-  p[key(a)]={surahNo:a.surahNo,surah:a.surah,ayah:a.ayahNo,page:a.page||currentPage,status,date:todayStr()};
-  saveLS(LS.progress,p);
-  if(status==='Hafal Lancar') createReviewSchedule(a);
-  updateDashboard();
-  const box=$('ayah_'+safeId(a));if(box)box.className='ayah '+ayahClass(a);
-  toast(status+' disimpan');
-}
-function createReviewSchedule(a){
-  const reviews=loadLS(LS.reviews,[]);
-  [1,3,7,14,30].forEach(h=>reviews.push({id:Date.now()+h+Math.random(),date:addDays(h),label:'H+'+h,surahNo:a.surahNo,surah:a.surah,start:a.ayahNo,end:a.ayahNo,page:a.page||currentPage,done:false}));
-  saveLS(LS.reviews,reviews);
-}
-function playAudio(url){if(AUDIO)AUDIO.pause();AUDIO=new Audio(url);AUDIO.play().catch(()=>toast('Audio belum bisa diputar'))}
-
-async function loadSurahList(){
-  try{
-    const r=await fetch(API+'/surat');const j=await r.json();
-    SURAH=j.data||[];renderSurahList();
-  }catch(e){toast('Gagal memuat daftar surat')}
-}
-function renderSurahList(){
-  const q=($('searchSurah').value||'').toLowerCase();
-  const list=SURAH.filter(s=>!q||s.namaLatin.toLowerCase().includes(q)||String(s.nomor)===q);
-  $('surahList').innerHTML=list.map(s=>`<button class="surah-btn" onclick="openSurah(${s.nomor})"><span><b>${s.nomor}. ${s.namaLatin}</b><br><small>${s.nama} • ${s.jumlahAyat} ayat</small></span><b>›</b></button>`).join('')||'<div class="empty">Surat tidak ditemukan.</div>';
-}
-async function openSurah(no){
-  const info=SURAH.find(s=>String(s.nomor)===String(no));
-  currentSurah=info;$('rangeTools').classList.remove('hidden');
-  $('readStart').value=1;$('readEnd').value=Math.min(5,info.jumlahAyat);
-  await loadSurahAyat();
-}
-async function loadSurahAyat(){
-  if(!currentSurah)return;
-  const awal=Number($('readStart').value)||1,akhir=Number($('readEnd').value)||awal;
-  $('ayahList').innerHTML='<div class="card empty">Memuat '+currentSurah.namaLatin+'...</div>';
-  try{
-    const r=await fetch(API+'/surat/'+currentSurah.nomor);const j=await r.json();
-    const s=j.data;currentSurah=s;
-    const ayahs=(s.ayat||[]).filter(a=>a.nomorAyat>=awal&&a.nomorAyat<=akhir).map((a,i)=>normalizeAyah(a,i));
-    saveLS(LS.last,{type:'surah',surahNo:s.nomor,awal,akhir,date:todayStr()});
-    renderAyahs(ayahs,s.namaLatin,false);
-    updateDashboard();
-  }catch(e){toast('Gagal memuat ayat')}
-}
-
-function buildPageGrid(){let html='';for(let i=1;i<=TOTAL_PAGES;i++)html+=`<button class="page-btn" id="pg_${i}" onclick="openMushafPage(${i})">${i}</button>`;$('pageGrid').innerHTML=html}
-function setActivePageBtn(n){document.querySelectorAll('.page-btn').forEach(b=>b.classList.remove('active'));$('pg_'+n)?.classList.add('active')}
-function prevMushafPage(){openMushafPage(Math.max(1,currentPage-1))}
-function nextMushafPage(){openMushafPage(Math.min(TOTAL_PAGES,currentPage+1))}
-function resumeReading(){
-  const last=loadLS(LS.last,null);
-  openPage('mushaf');
-  if(!last){setMushafTab('page');openMushafPage(1);return}
-  if(last.type==='surah'){setMushafTab('surah');loadSurahList().then(()=>openSurah(last.surahNo).then(()=>{$('readStart').value=last.awal||1;$('readEnd').value=last.akhir||5;loadSurahAyat()}));}
-  else{setMushafTab('page');openMushafPage(last.page||1);}
-}
-
-function quickTarget(count){const start=Number($('targetStart').value)||1;$('targetEnd').value=start+count-1}
-function saveTarget(){
-  const targets=loadLS(LS.targets,[]);
-  targets.push({id:Date.now(),date:todayStr(),mode:$('targetMode').value,page:Number($('targetPage').value),start:Number($('targetStart').value),end:Number($('targetEnd').value),done:false});
-  saveLS(LS.targets,targets);toast('Target disimpan');updateDashboard();renderTargets();
-}
-function renderTargets(){
-  const targets=loadLS(LS.targets,[]).slice().reverse();
-  $('targetList').innerHTML=targets.length?targets.map(t=>`<div class="listitem"><b>${t.mode}</b><br>Halaman ${t.page} • Ayat ${t.start}-${t.end}<br><span class="small">${t.date}</span><div class="row" style="margin-top:8px"><button class="secondary" onclick="openTarget(${t.page})">Buka</button><button class="secondary" onclick="deleteTarget(${t.id})">Hapus</button></div></div>`).join(''):'<div class="empty">Belum ada target.</div>';
-}
-function openTarget(page){openPage('mushaf');setMushafTab('page');openMushafPage(page)}
-function deleteTarget(id){saveLS(LS.targets,loadLS(LS.targets,[]).filter(t=>t.id!==id));updateDashboard();toast('Target dihapus')}
-
-function renderReviews(){
-  const reviews=loadLS(LS.reviews,[]).filter(r=>!r.done).sort((a,b)=>a.date.localeCompare(b.date));
-  $('reviewList').innerHTML=reviews.length?reviews.map(r=>`<div class="listitem"><b>${r.date} • ${r.label}</b><br>${r.surah||'Surah '+r.surahNo} ${r.start}-${r.end} • Hal. ${r.page}<div class="row" style="margin-top:8px"><button class="secondary" onclick="openTarget(${r.page})">Buka</button><button class="secondary" onclick="doneReview(${r.id})">Selesai</button></div></div>`).join(''):'<div class="empty">Belum ada jadwal.</div>';
-}
-function renderHard(){
-  const vals=Object.values(loadLS(LS.progress,{})).filter(v=>v.status==='Perlu Ulang'||v.status==='Belum Hafal');
-  $('hardList').innerHTML=vals.length?vals.map(v=>`<div class="listitem"><b>${v.surah||'Surah '+v.surahNo} : ${v.ayah}</b><br>Hal. ${v.page} • ${v.status}<br><span class="small">${v.date}</span></div>`).join(''):'<div class="empty">Belum ada ayat sulit.</div>';
-}
-function doneReview(id){const reviews=loadLS(LS.reviews,[]);const r=reviews.find(x=>x.id===id);if(r)r.done=true;saveLS(LS.reviews,reviews);toast('Murojaah selesai');updateDashboard()}
-
-function updateDashboard(){
-  const p=loadLS(LS.progress,{}),vals=Object.values(p);
-  const ok=vals.filter(x=>x.status==='Hafal Lancar').length,rev=vals.filter(x=>x.status==='Perlu Ulang').length,total=vals.length,pct=total?Math.round(ok/total*100):0;
-  $('statOk').innerText=ok;$('statReview').innerText=rev;$('statTarget').innerText=loadLS(LS.targets,[]).length;$('statStreak').innerText=getStreak();
-  $('totalBar').style.width=pct+'%';$('totalPercent').innerText=pct+'%';
-  const last=loadLS(LS.last,null);
-  $('lastReadText').innerText=last?(last.type==='surah'?`Terakhir: Surah ${last.surahNo} ayat ${last.awal}-${last.akhir}`:`Terakhir: Halaman ${last.page}`):'Belum ada bacaan terakhir.';
-  const today=loadLS(LS.reviews,[]).filter(r=>r.date<=todayStr()&&!r.done);
-  $('todayReviews').innerHTML=today.length?today.map(r=>`<div class="listitem"><b>${r.label}</b> ${r.surah||'Surah '+r.surahNo} ${r.start}-${r.end} • Hal. ${r.page}</div>`).join(''):'<div class="empty">Belum ada jadwal.</div>';
-  renderProgress();renderTargets();renderReviews();renderHard();
-}
-function getStreak(){
-  const dates=[...new Set(Object.values(loadLS(LS.progress,{})).map(x=>x.date))].sort().reverse();
-  let d=new Date(),count=0;
-  for(const ds of dates){const t=todayStr(d);if(ds===t){count++;d.setDate(d.getDate()-1)}}
-  return count;
-}
-function renderProgress(){
-  const vals=Object.values(loadLS(LS.progress,{}));const group={};
-  vals.forEach(v=>{const name=v.surah||('Surah '+v.surahNo);group[name]=group[name]||{total:0,ok:0,review:0,hard:0};group[name].total++;if(v.status==='Hafal Lancar')group[name].ok++;if(v.status==='Perlu Ulang')group[name].review++;if(v.status==='Belum Hafal')group[name].hard++});
-  const html=Object.entries(group).map(([name,g])=>{const pct=Math.round(g.ok/g.total*100);return `<div class="listitem"><b>${name}</b><div class="progressbar" style="margin:8px 0"><span style="width:${pct}%"></span></div><span class="small">${pct}% • ✅ ${g.ok} 🟡 ${g.review} 🔴 ${g.hard}</span></div>`}).join('');
-  $('progressList').innerHTML=html||'<div class="empty">Belum ada progress.</div>';
-}
-function openPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  const idx={home:0,mushaf:1,target:2,review:3,progress:4}[id];document.querySelectorAll('.nav button')[idx].classList.add('active');
-  updateDashboard();
-}
-function exportProgress(){
-  const data={progress:loadLS(LS.progress,{}),targets:loadLS(LS.targets,[]),reviews:loadLS(LS.reviews,[]),last:loadLS(LS.last,null),date:new Date().toISOString()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-murojaah-tije.json';a.click();
-}
-function resetProgress(){if(confirm('Hapus semua progress lokal?')){Object.values(LS).forEach(k=>localStorage.removeItem(k));updateDashboard();toast('Data lokal direset')}}
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./service-worker.js').catch(()=>{})}
-
-buildPageGrid();
-updateDashboard();
-openMushafPage(1);
+const PAGE_PATH='data/pages/page-', PAGE_EXT='.json', TOTAL_PAGES=604, API='https://equran.id/api/v2';
+let currentPage=1,currentPageData=null,AYAH_MAP={},SURAH=[],cleanMode=false,currentTab='page';
+const LS={progress:'mt_progress_v3',targets:'mt_targets_v3',reviews:'mt_reviews_v3',last:'mt_last_v3'};
+function $(id){return document.getElementById(id)}function toast(msg){$('toast').innerText=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2300)}function todayStr(d=new Date()){return d.toISOString().slice(0,10)}function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return todayStr(d)}function loadLS(k,def){try{return JSON.parse(localStorage.getItem(k))??def}catch(e){return def}}function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}function pad(n){return String(n).padStart(3,'0')}function pageUrl(n){return PAGE_PATH+pad(n)+PAGE_EXT}function esc(t){return String(t||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function setMushafTab(t){currentTab=t;$('tabPage').classList.toggle('on',t==='page');$('tabSurah').classList.toggle('on',t==='surah');$('pagePanel').classList.toggle('hidden',t!=='page');$('surahPanel').classList.toggle('hidden',t!=='surah');if(t==='surah'&&!SURAH.length)loadSurah();if(t==='page')openMushafPage(currentPage)}function toggleCleanMode(){cleanMode=!cleanMode;toast(cleanMode?'Mode bersih aktif':'Mode tombol aktif');renderCurrent()}
+function normalizePageJson(raw,pageNo){if(Array.isArray(raw))return{page:pageNo,ayahs:raw};if(raw.ayahs)return raw;if(raw.verses)return{page:raw.page||pageNo,ayahs:raw.verses};if(raw.data&&Array.isArray(raw.data))return{page:pageNo,ayahs:raw.data};if(raw.data&&raw.data.ayahs)return raw.data;return{page:pageNo,ayahs:[]}}
+function normalizeAyah(a,i){return{surahNo:Number(a.surahNo??a.surah_number??a.sura??a.chapter??a.surah?.number??0),surah:a.surah??a.surahName??a.namaLatin??a.latin??a.surah_name??a.chapterName??'',ayahNo:Number(a.ayahNo??a.nomorAyat??a.number??a.ayah_number??a.verse??a.aya??i+1),arab:a.arab??a.text??a.arabic??a.uthmani??a.teksArab??'',translation:a.translation??a.arti??a.teksIndonesia??a.id??'',juz:a.juz??'',page:a.page??currentPage}}
+async function openMushafPage(n){if(!n||n<1||n>TOTAL_PAGES){toast('Nomor halaman 1-604');return}currentPage=n;$('pageInput').value=n;$('ayahList').innerHTML='<div class="card empty">Memuat halaman '+n+'...</div>';try{const r=await fetch(pageUrl(n),{cache:'no-cache'});if(!r.ok)throw new Error('File halaman belum ada');const raw=await r.json();currentPageData=normalizePageJson(raw,n);const ayahs=(currentPageData.ayahs||[]).map(normalizeAyah);saveLS(LS.last,{type:'page',page:n,date:todayStr()});renderPageAyahs(ayahs,n);$('statusChip').innerText='📖 Mushaf 604 • Halaman '+n}catch(e){$('ayahList').innerHTML='<div class="card empty">⚠️ File <b>'+pageUrl(n)+'</b> belum ada.<br><br>Gunakan menu <b>Surah Online</b> dulu, atau upload data halaman 604 nanti.</div>';if(!SURAH.length)loadSurah();}updateDashboard()}
+function renderCurrent(){if(currentTab==='page'&&currentPageData){renderPageAyahs((currentPageData.ayahs||[]).map(normalizeAyah),currentPage)}else if(currentTab==='surah'&&window.currentSurahAyahs){renderSurahAyahs(window.currentSurahAyahs,window.currentSurahName)}}
+function renderPageAyahs(ayahs,pageNo){if(!ayahs.length){$('ayahList').innerHTML='<div class="card empty">Halaman kosong / format JSON belum cocok.</div>';return}AYAH_MAP={};const sur=ayahs[0].surah||'Mushaf';$('targetPage').value='Halaman '+pageNo;$('ayahList').innerHTML='<div class="mushaf-shell"><div class="mushaf-head"><h2>Halaman '+pageNo+'</h2><div class="meta">'+esc(sur)+' • '+ayahs.length+' ayat</div></div><div class="mushaf-page">'+ayahs.map(a=>ayahHTML(a,true)).join('')+'</div></div>'}
+async function loadSurah(){try{const r=await fetch(API+'/surat');const j=await r.json();SURAH=j.data||[];renderSurahList()}catch(e){toast('Gagal memuat daftar surat')}}function renderSurahList(){const q=($('searchSurah')?.value||'').toLowerCase();const list=SURAH.filter(s=>!q||s.namaLatin.toLowerCase().includes(q)||String(s.nomor)===q);$('surahList').innerHTML=list.map(s=>'<button class="surah-btn" onclick="openSurahOnline('+s.nomor+')"><span><b>'+s.nomor+'. '+s.namaLatin+'</b><br><small>'+s.nama+' • '+s.jumlahAyat+' ayat</small></span><b>›</b></button>').join('')||'<div class="empty">Surat tidak ditemukan.</div>'}
+async function openSurahOnline(no){$('ayahList').innerHTML='<div class="card empty">Memuat surah...</div>';try{const r=await fetch(API+'/surat/'+no);const j=await r.json();const s=j.data;const ayahs=(s.ayat||[]).map((a,i)=>normalizeAyah({surahNo:s.nomor,surah:s.namaLatin,ayahNo:a.nomorAyat,arab:a.teksArab,translation:a.teksIndonesia,page:a.nomorAyat},i));window.currentSurahAyahs=ayahs;window.currentSurahName=s.namaLatin;saveLS(LS.last,{type:'surah',surahNo:no,surah:s.namaLatin,date:todayStr()});renderSurahAyahs(ayahs,s.namaLatin);$('targetPage').value=s.namaLatin;$('statusChip').innerText='📚 Surah Online • '+s.namaLatin}catch(e){toast('Gagal memuat surah')}}function renderSurahAyahs(ayahs,name){AYAH_MAP={};$('ayahList').innerHTML='<div class="mushaf-shell"><div class="mushaf-head"><h2>'+esc(name)+'</h2><div class="meta">Ayat 1 - '+ayahs.length+'</div></div><div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div><div class="mushaf-page">'+ayahs.map(a=>ayahHTML(a,true)).join('')+'</div></div>'}
+function key(a){return (a.surahNo||a.surah)+':'+a.ayahNo}function ayahClass(a){const p=loadLS(LS.progress,{});const st=p[key(a)]?.status;if(st==='Hafal Lancar')return'ok';if(st==='Perlu Ulang')return'review';if(st==='Belum Hafal')return'hard';return''}function safeId(a){return String((a.surahNo||a.surah)+'_'+a.ayahNo).replace(/[^a-zA-Z0-9_]/g,'_')}function ayahNumber(n){return '<span class="ayah-no">'+n+'</span>'}
+function ayahHTML(a,mushaf){const id=safeId(a);AYAH_MAP[id]=a;return '<div class="ayah '+(mushaf?'mushaf-line ':'')+ayahClass(a)+'" id="ayah_'+id+'"><span class="badge">'+esc(a.surah||'Surah '+a.surahNo)+' : '+a.ayahNo+(a.juz?' • Juz '+a.juz:'')+'</span><div class="arab">'+esc(a.arab)+' '+ayahNumber(a.ayahNo)+'</div>'+(a.translation?'<p class="translation">'+esc(a.translation)+'</p>':'')+(cleanMode?'':'<div class="btn-row"><button onclick="markAyahById(\''+id+'\',\'Hafal Lancar\')">✅ Tandai Hafal</button><button onclick="markAyahById(\''+id+'\',\'Perlu Ulang\')">🟡 Perlu Ulang</button><button onclick="markAyahById(\''+id+'\',\'Belum Hafal\')">🔴 Belum</button><button onclick="setTargetFromAyah(\''+id+'\')">🎯 Target</button></div>')+'</div>'}
+function setTargetFromAyah(id){const a=AYAH_MAP[id];$('targetPage').value=a.surah||('Halaman '+(a.page||currentPage));$('targetStart').value=a.ayahNo;$('targetEnd').value=a.ayahNo;openPage('target')}
+function markAyahById(id,status){const a=AYAH_MAP[id];if(!a){toast('Data ayat tidak ditemukan');return}const p=loadLS(LS.progress,{});p[key(a)]={surahNo:a.surahNo,surah:a.surah,ayah:a.ayahNo,page:a.page||currentPage,status,date:todayStr()};saveLS(LS.progress,p);if(status==='Hafal Lancar')createReviewSchedule(a);const box=$('ayah_'+safeId(a));if(box)box.className='ayah mushaf-line '+ayahClass(a);updateDashboard();toast(status+' disimpan')}
+function createReviewSchedule(a){const reviews=loadLS(LS.reviews,[]);[1,3,7,14,30].forEach(h=>reviews.push({id:Date.now()+h+Math.random(),date:addDays(h),label:'H+'+h,surahNo:a.surahNo,surah:a.surah,start:a.ayahNo,end:a.ayahNo,page:a.page||currentPage,done:false}));saveLS(LS.reviews,reviews)}function prevMushafPage(){openMushafPage(Math.max(1,currentPage-1))}function nextMushafPage(){openMushafPage(Math.min(TOTAL_PAGES,currentPage+1))}
+function resumeReading(){const last=loadLS(LS.last,null);openPage('mushaf');if(last?.type==='surah'){setMushafTab('surah');setTimeout(()=>openSurahOnline(last.surahNo),300)}else{setMushafTab('page');openMushafPage(last?.page||1)}}function quickTarget(count){const start=Number($('targetStart').value)||1;$('targetEnd').value=start+count-1}function saveTarget(){const targets=loadLS(LS.targets,[]);targets.push({id:Date.now(),date:todayStr(),mode:$('targetMode').value,ref:$('targetPage').value,start:Number($('targetStart').value),end:Number($('targetEnd').value),done:false});saveLS(LS.targets,targets);toast('Target disimpan');updateDashboard();renderTargets()}
+function renderTargets(){const targets=loadLS(LS.targets,[]).slice().reverse();$('targetList').innerHTML=targets.length?targets.map(t=>'<div class="listitem"><b>'+esc(t.mode)+'</b><br>'+esc(t.ref)+' • Ayat '+t.start+'-'+t.end+'<br><span class="small">'+t.date+'</span></div>').join(''):'<div class="empty">Belum ada target.</div>'}function renderReviews(){const reviews=loadLS(LS.reviews,[]).filter(r=>!r.done).sort((a,b)=>a.date.localeCompare(b.date));$('reviewList').innerHTML=reviews.length?reviews.map(r=>'<div class="listitem"><b>'+r.date+' • '+r.label+'</b><br>'+esc(r.surah||('Surah '+r.surahNo))+' '+r.start+'-'+r.end+'<br><button class="secondary" onclick="doneReview('+r.id+')" style="margin-top:8px">Tandai Selesai</button></div>').join(''):'<div class="empty">Belum ada jadwal.</div>'}function doneReview(id){const reviews=loadLS(LS.reviews,[]);const r=reviews.find(x=>Number(x.id)===Number(id));if(r)r.done=true;saveLS(LS.reviews,reviews);toast('Murojaah selesai');updateDashboard();renderReviews()}
+function updateDashboard(){const vals=Object.values(loadLS(LS.progress,{}));const ok=vals.filter(x=>x.status==='Hafal Lancar').length,rev=vals.filter(x=>x.status==='Perlu Ulang').length,hard=vals.filter(x=>x.status==='Belum Hafal').length,total=vals.length,pct=total?Math.round(ok/total*100):0;$('statOk').innerText=ok;$('statReview').innerText=rev;$('statHard').innerText=hard;$('statTarget').innerText=loadLS(LS.targets,[]).length;$('totalBar').style.width=pct+'%';$('totalPercent').innerText=pct+'%';const last=loadLS(LS.last,null);$('lastReadText').innerText=last?(last.type==='surah'?'Terakhir: '+last.surah:'Terakhir: Halaman '+last.page):'Belum ada halaman terakhir.';const today=loadLS(LS.reviews,[]).filter(r=>r.date<=todayStr()&&!r.done);$('todayReviews').innerHTML=today.length?today.map(r=>'<div class="listitem"><b>'+r.label+'</b> '+esc(r.surah||('Surah '+r.surahNo))+' '+r.start+'-'+r.end+'</div>').join(''):'<div class="empty">Belum ada jadwal.</div>';renderProgress();renderTargets();renderReviews()}
+function renderProgress(){const vals=Object.values(loadLS(LS.progress,{}));const group={};vals.forEach(v=>{const name=v.surah||('Surah '+v.surahNo);group[name]=group[name]||{total:0,ok:0,review:0,hard:0};group[name].total++;if(v.status==='Hafal Lancar')group[name].ok++;if(v.status==='Perlu Ulang')group[name].review++;if(v.status==='Belum Hafal')group[name].hard++});$('progressList').innerHTML=Object.entries(group).map(([name,g])=>{const pct=Math.round(g.ok/g.total*100);return '<div class="listitem"><b>'+esc(name)+'</b><div class="progressbar" style="margin:8px 0"><span style="width:'+pct+'%"></span></div><span class="small">'+pct+'% • ✅ '+g.ok+' 🟡 '+g.review+' 🔴 '+g.hard+'</span></div>'}).join('')||'<div class="empty">Belum ada progress.</div>'}
+function openPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));const idx={home:0,mushaf:1,target:2,review:3,progress:4}[id];document.querySelectorAll('.nav button')[idx].classList.add('active');updateDashboard()}function exportProgress(){const data={progress:loadLS(LS.progress,{}),targets:loadLS(LS.targets,[]),reviews:loadLS(LS.reviews,[]),date:new Date().toISOString()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-murojaah-tije.json';a.click()}function resetProgress(){if(confirm('Hapus semua progress lokal?')){Object.values(LS).forEach(k=>localStorage.removeItem(k));updateDashboard();toast('Data lokal direset')}}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./service-worker.js').catch(()=>{})}updateDashboard();openMushafPage(1);
 </script>
 </body>
 </html>
