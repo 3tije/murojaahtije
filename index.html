@@ -93,7 +93,7 @@
     <label>Nomor halaman</label><div class="row"><input id="pageInput" type="number" min="1" max="604" value="1"><button onclick="openMushafPage(Number($('pageInput').value))">Buka</button></div>
   </div>
   <div id="surahPanel" class="card hidden">
-    <h3>Surah Online</h3><input class="search" id="searchSurah" placeholder="Cari surat, contoh: An-Nas" oninput="renderSurahList()"><div id="surahList" class="surah-grid"></div>
+    <h3>Surah Online</h3><div class="row" style="margin-bottom:8px"><button class="secondary" onclick="loadSurah()">🔄 Muat Ulang Daftar Surah</button></div><input class="search" id="searchSurah" placeholder="Cari surat, contoh: An-Nas" oninput="renderSurahList()"><div id="surahList" class="surah-grid"></div>
   </div>
   <div id="ayahList"></div>
 </section>
@@ -190,18 +190,77 @@
 <div id="toast" class="toast"></div>
 
 <script>
-const PAGE_PATH='data/pages/page-', PAGE_EXT='.json', TOTAL_PAGES=604, API='https://equran.id/api/v2';
+const PAGE_PATH='data/pages/page-', PAGE_EXT='.json', TOTAL_PAGES=604, API_BASES=['https://equran.id/api/v2','https://equran.id/api'];
 let currentPage=1,currentPageData=null,AYAH_MAP={},SURAH=[],cleanMode=false,currentTab='page',AUDIO=null,audioQueue=[],audioIndex=0,audioRepeat=1,audioRepeatCount=0,audioLoop=false,TRAINING=[],trainingIndex=0,trainingRandom=false,currentTrainingAyah=null;
 const LS={progress:'mt_progress_v3',targets:'mt_targets_v3',reviews:'mt_reviews_v3',last:'mt_last_v3'};
 function $(id){return document.getElementById(id)}function toast(msg){$('toast').innerText=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2300)}function todayStr(d=new Date()){return d.toISOString().slice(0,10)}function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return todayStr(d)}function loadLS(k,def){try{return JSON.parse(localStorage.getItem(k))??def}catch(e){return def}}function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))}function pad(n){return String(n).padStart(3,'0')}function pageUrl(n){return PAGE_PATH+pad(n)+PAGE_EXT}function esc(t){return String(t||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+async function fetchQuran(path){
+  let lastError=null;
+  for(const base of API_BASES){
+    try{
+      const r=await fetch(base+path,{cache:'no-store'});
+      if(!r.ok)throw new Error('HTTP '+r.status+' dari '+base);
+      const j=await r.json();
+      if(!j)throw new Error('Respons kosong dari '+base);
+      return j;
+    }catch(e){
+      lastError=e;
+      console.warn('Quran API gagal:',base+path,e);
+    }
+  }
+  throw lastError||new Error('Semua sumber Al-Quran gagal diakses');
+}
+
 function setMushafTab(t){currentTab=t;$('tabPage').classList.toggle('on',t==='page');$('tabSurah').classList.toggle('on',t==='surah');$('pagePanel').classList.toggle('hidden',t!=='page');$('surahPanel').classList.toggle('hidden',t!=='surah');if(t==='surah'&&!SURAH.length)loadSurah();if(t==='page')openMushafPage(currentPage)}function toggleCleanMode(){cleanMode=!cleanMode;toast(cleanMode?'Mode bersih aktif':'Mode tombol aktif');renderCurrent()}
 function normalizePageJson(raw,pageNo){if(Array.isArray(raw))return{page:pageNo,ayahs:raw};if(raw.ayahs)return raw;if(raw.verses)return{page:raw.page||pageNo,ayahs:raw.verses};if(raw.data&&Array.isArray(raw.data))return{page:pageNo,ayahs:raw.data};if(raw.data&&raw.data.ayahs)return raw.data;return{page:pageNo,ayahs:[]}}
 function normalizeAyah(a,i){return{surahNo:Number(a.surahNo??a.surah_number??a.sura??a.chapter??a.surah?.number??0),surah:a.surah??a.surahName??a.namaLatin??a.latin??a.surah_name??a.chapterName??'',ayahNo:Number(a.ayahNo??a.nomorAyat??a.number??a.ayah_number??a.verse??a.aya??i+1),arab:a.arab??a.text??a.arabic??a.uthmani??a.teksArab??'',translation:a.translation??a.arti??a.teksIndonesia??a.id??'',juz:a.juz??'',page:a.page??currentPage,audio:a.audio??a.audioUrl??a.audio_url??''}}
 async function openMushafPage(n){if(!n||n<1||n>TOTAL_PAGES){toast('Nomor halaman 1-604');return}currentPage=n;$('pageInput').value=n;$('ayahList').innerHTML='<div class="card empty">Memuat halaman '+n+'...</div>';try{const r=await fetch(pageUrl(n),{cache:'no-cache'});if(!r.ok)throw new Error('File halaman belum ada');const raw=await r.json();currentPageData=normalizePageJson(raw,n);const ayahs=(currentPageData.ayahs||[]).map(normalizeAyah);saveLS(LS.last,{type:'page',page:n,date:todayStr()});renderPageAyahs(ayahs,n);$('statusChip').innerText='📖 Mushaf 604 • Halaman '+n}catch(e){$('ayahList').innerHTML='<div class="card empty">⚠️ File <b>'+pageUrl(n)+'</b> belum ada.<br><br>Gunakan menu <b>Surah Online</b> dulu, atau upload data halaman 604 nanti.</div>';if(!SURAH.length)loadSurah();}updateDashboard()}
 function renderCurrent(){if(currentTab==='page'&&currentPageData){renderPageAyahs((currentPageData.ayahs||[]).map(normalizeAyah),currentPage)}else if(currentTab==='surah'&&window.currentSurahAyahs){renderSurahAyahs(window.currentSurahAyahs,window.currentSurahName)}}
 function renderPageAyahs(ayahs,pageNo){if(!ayahs.length){$('ayahList').innerHTML='<div class="card empty">Halaman kosong / format JSON belum cocok.</div>';return}AYAH_MAP={};const sur=ayahs[0].surah||'Mushaf';$('targetPage').value='Halaman '+pageNo;$('ayahList').innerHTML='<div class="mushaf-shell"><div class="mushaf-head"><h2>Halaman '+pageNo+'</h2><div class="meta">'+esc(sur)+' • '+ayahs.length+' ayat</div></div><div class="mushaf-page">'+ayahs.map(a=>ayahHTML(a,true)).join('')+'</div></div>'}
-async function loadSurah(){try{const r=await fetch(API+'/surat');const j=await r.json();SURAH=j.data||[];renderSurahList();populateTrainingSurah()}catch(e){toast('Gagal memuat daftar surat')}}function renderSurahList(){const q=($('searchSurah')?.value||'').toLowerCase();const list=SURAH.filter(s=>!q||s.namaLatin.toLowerCase().includes(q)||String(s.nomor)===q);$('surahList').innerHTML=list.map(s=>'<button class="surah-btn" onclick="openSurahOnline('+s.nomor+')"><span><b>'+s.nomor+'. '+s.namaLatin+'</b><br><small>'+s.nama+' • '+s.jumlahAyat+' ayat</small></span><b>›</b></button>').join('')||'<div class="empty">Surat tidak ditemukan.</div>'}
-async function openSurahOnline(no){$('ayahList').innerHTML='<div class="card empty">Memuat surah...</div>';try{const r=await fetch(API+'/surat/'+no);const j=await r.json();const s=j.data;const ayahs=(s.ayat||[]).map((a,i)=>normalizeAyah({surahNo:s.nomor,surah:s.namaLatin,ayahNo:a.nomorAyat,arab:a.teksArab,translation:a.teksIndonesia,page:a.nomorAyat,audio:a.audio},i));window.currentSurahAyahs=ayahs;window.currentSurahName=s.namaLatin;saveLS(LS.last,{type:'surah',surahNo:no,surah:s.namaLatin,date:todayStr()});renderSurahAyahs(ayahs,s.namaLatin);$('targetPage').value=s.namaLatin;$('statusChip').innerText='📚 Surah Online • '+s.namaLatin}catch(e){toast('Gagal memuat surah')}}function renderSurahAyahs(ayahs,name){AYAH_MAP={};$('ayahList').innerHTML='<div class="audio-panel"><div class="audio-title"><b>🎧 Murottal '+esc(name)+'</b><span class="small">per ayat berurutan</span></div><div class="audio-controls"><button onclick="playSurahAudio()">▶ Putar Surat</button><button class="secondary" onclick="stopAudio()">⏹ Hentikan</button></div><div class="repeat-row"><button id="rep1" class="on" onclick="setAudioRepeat(1)">1×</button><button id="rep3" onclick="setAudioRepeat(3)">3×</button><button id="rep5" onclick="setAudioRepeat(5)">5×</button><button id="repLoop" onclick="setAudioRepeat(0)">Terus</button></div><div id="nowPlaying" class="now-playing">Pilih Putar Surat atau tombol audio pada ayat.</div></div><div class="mushaf-shell"><div class="mushaf-head"><h2>'+esc(name)+'</h2><div class="meta">Ayat 1 - '+ayahs.length+'</div></div><div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div><div class="mushaf-page">'+ayahs.map(a=>ayahHTML(a,true)).join('')+'</div></div>'}
+async function loadSurah(){
+  const listEl=$('surahList');
+  if(listEl)listEl.innerHTML='<div class="empty">Memuat 114 surah…</div>';
+  try{
+    const j=await fetchQuran('/surat');
+    SURAH=Array.isArray(j.data)?j.data:(Array.isArray(j)?j:[]);
+    if(!SURAH.length)throw new Error('Daftar surah kosong');
+    renderSurahList();
+    populateTrainingSurah();
+  }catch(e){
+    console.error(e);
+    if(listEl)listEl.innerHTML='<div class="empty">⚠️ Daftar surah belum dapat dimuat.<br><br><button onclick="loadSurah()">🔄 Coba Lagi</button></div>';
+    toast('Sumber surah gagal diakses. Tekan Coba Lagi.');
+  }
+}
+function renderSurahList(){const q=($('searchSurah')?.value||'').toLowerCase();const list=SURAH.filter(s=>!q||s.namaLatin.toLowerCase().includes(q)||String(s.nomor)===q);$('surahList').innerHTML=list.map(s=>'<button class="surah-btn" onclick="openSurahOnline('+s.nomor+')"><span><b>'+s.nomor+'. '+s.namaLatin+'</b><br><small>'+s.nama+' • '+s.jumlahAyat+' ayat</small></span><b>›</b></button>').join('')||'<div class="empty">Surat tidak ditemukan.</div>'}
+async function openSurahOnline(no){
+  $('ayahList').innerHTML='<div class="card empty">Memuat surah...</div>';
+  try{
+    const j=await fetchQuran('/surat/'+no);
+    const s=j.data||j;
+    if(!s||!Array.isArray(s.ayat))throw new Error('Format detail surah tidak cocok');
+    const ayahs=(s.ayat||[]).map((a,i)=>normalizeAyah({
+      surahNo:s.nomor,
+      surah:s.namaLatin,
+      ayahNo:a.nomorAyat,
+      arab:a.teksArab,
+      translation:a.teksIndonesia,
+      page:a.nomorAyat,
+      audio:a.audio
+    },i));
+    window.currentSurahAyahs=ayahs;
+    window.currentSurahName=s.namaLatin;
+    saveLS(LS.last,{type:'surah',surahNo:no,surah:s.namaLatin,date:todayStr()});
+    renderSurahAyahs(ayahs,s.namaLatin);
+    $('targetPage').value=s.namaLatin;
+    $('statusChip').innerText='📚 Surah Online • '+s.namaLatin;
+  }catch(e){
+    console.error(e);
+    $('ayahList').innerHTML='<div class="card empty">⚠️ Surah gagal dimuat.<br><br><button onclick="openSurahOnline('+no+')">🔄 Coba Lagi</button></div>';
+    toast('Gagal memuat surah');
+  }
+}
+function renderSurahAyahs(ayahs,name){AYAH_MAP={};$('ayahList').innerHTML='<div class="audio-panel"><div class="audio-title"><b>🎧 Murottal '+esc(name)+'</b><span class="small">per ayat berurutan</span></div><div class="audio-controls"><button onclick="playSurahAudio()">▶ Putar Surat</button><button class="secondary" onclick="stopAudio()">⏹ Hentikan</button></div><div class="repeat-row"><button id="rep1" class="on" onclick="setAudioRepeat(1)">1×</button><button id="rep3" onclick="setAudioRepeat(3)">3×</button><button id="rep5" onclick="setAudioRepeat(5)">5×</button><button id="repLoop" onclick="setAudioRepeat(0)">Terus</button></div><div id="nowPlaying" class="now-playing">Pilih Putar Surat atau tombol audio pada ayat.</div></div><div class="mushaf-shell"><div class="mushaf-head"><h2>'+esc(name)+'</h2><div class="meta">Ayat 1 - '+ayahs.length+'</div></div><div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div><div class="mushaf-page">'+ayahs.map(a=>ayahHTML(a,true)).join('')+'</div></div>'}
 function key(a){return (a.surahNo||a.surah)+':'+a.ayahNo}function ayahClass(a){const p=loadLS(LS.progress,{});const st=p[key(a)]?.status;if(st==='Hafal Lancar')return'ok';if(st==='Perlu Ulang')return'review';if(st==='Belum Hafal')return'hard';return''}function safeId(a){return String((a.surahNo||a.surah)+'_'+a.ayahNo).replace(/[^a-zA-Z0-9_]/g,'_')}function ayahNumber(n){return '<span class="ayah-no">'+n+'</span>'}
 function getAudioUrl(a){if(!a||!a.audio)return '';if(typeof a.audio==='string')return a.audio;const vals=Object.values(a.audio||{});return vals.find(Boolean)||''}
 function ayahHTML(a,mushaf){const id=safeId(a);AYAH_MAP[id]=a;const audio=getAudioUrl(a);return '<div class="ayah '+(mushaf?'mushaf-line ':'')+ayahClass(a)+'" id="ayah_'+id+'"><span class="badge">'+esc(a.surah||'Surah '+a.surahNo)+' : '+a.ayahNo+(a.juz?' • Juz '+a.juz:'')+'</span><div class="arab hafs">'+esc(a.arab)+' '+ayahNumber(a.ayahNo)+'</div>'+(a.translation?'<p class="translation">'+esc(a.translation)+'</p>':'')+(audio&&!cleanMode?'<button class="ayah-audio" onclick="playSingleAyah(\''+id+'\')">🎧 Dengarkan Ayat Ini</button>':'')+(cleanMode?'':'<div class="btn-row"><button onclick="markAyahById(\''+id+'\',\'Hafal Lancar\')">✅ Tandai Hafal</button><button onclick="markAyahById(\''+id+'\',\'Perlu Ulang\')">🟡 Perlu Ulang</button><button onclick="markAyahById(\''+id+'\',\'Belum Hafal\')">🔴 Belum</button><button onclick="setTargetFromAyah(\''+id+'\')">🎯 Target</button></div>')+'</div>'}
@@ -216,13 +275,15 @@ function playQueueItem(){if(!audioQueue.length)return;if(audioIndex>=audioQueue.
 async function ensureSurahLoaded(){
   if(SURAH.length)return true;
   try{
-    const r=await fetch(API+'/surat');
-    const j=await r.json();
-    SURAH=j.data||[];
+    const j=await fetchQuran('/surat');
+    SURAH=Array.isArray(j.data)?j.data:(Array.isArray(j)?j:[]);
+    if(!SURAH.length)throw new Error('Daftar surah kosong');
+    renderSurahList();
     populateTrainingSurah();
-    return SURAH.length>0;
+    return true;
   }catch(e){
-    toast('Gagal memuat daftar surah');
+    console.error(e);
+    toast('Daftar surah belum dapat dimuat');
     return false;
   }
 }
@@ -239,10 +300,9 @@ async function prepareTrainingPage(){
   renderHardAyahs();
 }
 async function fetchTrainingSurah(no){
-  const r=await fetch(API+'/surat/'+no);
-  if(!r.ok)throw new Error('Surah gagal dimuat');
-  const j=await r.json();
-  const s=j.data;
+  const j=await fetchQuran('/surat/'+no);
+  const s=j.data||j;
+  if(!s||!Array.isArray(s.ayat))throw new Error('Format detail surah tidak cocok');
   return {
     surah:s,
     ayahs:(s.ayat||[]).map((a,i)=>normalizeAyah({
